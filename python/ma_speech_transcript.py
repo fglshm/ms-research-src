@@ -46,29 +46,33 @@ def tag_list(ngrams):
 
 def run(files, speech_type, n):
     word_tags = []
+    all_words = []
     for file in tqdm(files):
         transcript = open(file).read().strip()
         transcript = remove_words(transcript)
         words = nlp.tokens(transcript)
         words = nlp.rm(words)
+        all_words.append(words)
         tagged = nlp.tags(words)
         grams = nlp.ngrams(tagged, n)
         grams = [g for g in grams]
         word_tags.append(grams)
 
     word_tags = list(itertools.chain.from_iterable(word_tags))
-    print(n, len(word_tags))
     count = len(word_tags)
     tags = tag_list(word_tags)
     tag_dict = to_dict(tags)
     tag_dict = sorted(tag_dict.items(), key=lambda x: -x[1])
 
-    # result_path = '/Users/shohei/Desktop/tsukuba/research/master/data/results'
+    # all_words = list(itertools.chain.from_iterable(all_words))
+    # print(len(all_words))
 
-    # file = open("%s/%s_%sgrams.txt" % (result_path, speech_type, n), 'a')
-    # for tag in tag_dict:
-    #     file.write("%s: %s" % (tag[0], tag[1] / count))
-    #     file.write('\n')
+    result_path = '/Users/shohei/Desktop/tsukuba/research/master/data/results/ngrams'
+
+    file = open("%s/%s_%sgrams.txt" % (result_path, speech_type, n), 'a')
+    for tag in tag_dict:
+        file.write("%s: %s" % (tag[0], tag[1] / count))
+        file.write('\n')
 
 
 so_transcript_path = '/Users/shohei/Desktop/tsukuba/research/master/data/speech_original_transcripts/so'
@@ -79,6 +83,8 @@ nlp = NLP()
 so_files = glob.glob("%s/*" % so_transcript_path)
 nso_files = glob.glob("%s/*" % nso_transcript_path)
 
-for i in range(5):
-    run(so_files, 'so', i+2)
-    run(nso_files, 'nso', i+2)
+run(so_files, 'so', 2)
+
+# for i in range(5):
+#     run(so_files, 'so', i+2)
+#     run(nso_files, 'nso', i+2)

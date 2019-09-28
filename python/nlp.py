@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
 """
     自然言語処理関連の関数をまとめたクラス: NLP
 """
