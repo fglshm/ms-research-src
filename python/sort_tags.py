@@ -8,22 +8,6 @@ from tqdm import tqdm
 from operator import itemgetter
 
 
-def data_filename(s_type, n):
-    """
-        so/nso の ngram のファイル名を返す
-    """
-    return '%s/%s_%sgrams.txt' % (ngrams_path, s_type, n)
-
-
-def ngram_data(filename):
-    """
-        tag と 出現頻度の値を分割した配列を要素とした配列を返す
-    """
-    file = open(filename).read().strip().split('\n')
-    data = [elem.split(': ') for elem in file]
-    return data
-
-
 def remove_tags(data):
     """
         一定値以下の出現頻度のタグは削除して配列を返す
@@ -37,23 +21,6 @@ def remove_tags(data):
             break
 
     return data[0:idx]
-
-
-def common_tags(n):
-    """
-        so/nso 共通のタグを返す
-    """
-    so_ngrams_filename = data_filename('so', n)
-    nso_ngrams_filename = data_filename('nso', n)
-    common_tags = []
-    for filename in [so_ngrams_filename, nso_ngrams_filename]:
-        data = ngram_data(filename)
-        data = remove_tags(data)
-        [common_tags.append(elem[0]) for elem in data]
-    print("Finding common tags")
-    common_tags = [tag for tag in tqdm(set(
-        common_tags)) if common_tags.count(tag) == 2]
-    return common_tags
 
 
 def common_tag_frequencies(lst, n):
@@ -76,6 +43,39 @@ def common_tag_frequencies(lst, n):
         common_tag_frequencies.append([tag, so_value, nso_value])
 
     return common_tag_frequencies
+
+
+def data_filename(s_type, n):
+    """
+        so/nso の ngram のファイル名を返す
+    """
+    return '%s/%s_%sgrams.txt' % (ngrams_path, s_type, n)
+
+
+def ngram_data(filename):
+    """
+        tag と 出現頻度の値を分割した配列を要素とした配列を返す
+    """
+    file = open(filename).read().strip().split('\n')
+    data = [elem.split(': ') for elem in file]
+    return data
+
+
+def common_tags(n):
+    """
+        so/nso 共通のタグを返す
+    """
+    so_ngrams_filename = data_filename('so', n)
+    nso_ngrams_filename = data_filename('nso', n)
+    common_tags = []
+    for filename in [so_ngrams_filename, nso_ngrams_filename]:
+        data = ngram_data(filename)
+        data = remove_tags(data)
+        [common_tags.append(elem[0]) for elem in data]
+    print("Finding common tags")
+    common_tags = [tag for tag in tqdm(set(
+        common_tags)) if common_tags.count(tag) == 2]
+    return common_tags
 
 
 def frequency_gaps(lst, s_type):
@@ -116,11 +116,12 @@ def save_results(n, data):
         f.write("%s\n" % ",".join(elem))
 
 
-ngrams_path = '/Users/shohei/Desktop/tsukuba/research/master/data/results/ngrams'
-for n in [2, 3, 4, 5, 6]:
-    print("Executing %d-gram" % n)
-    tags = common_tags(n)
-    frequencies = common_tag_frequencies(tags, n)
-    gaps = frequency_gaps(frequencies, 'so')
-    sorted_gaps = sort_by_index(1, gaps)
-    save_results(n, sorted_gaps)
+if __name__ == '__main__':
+    ngrams_path = '/Users/shohei/Desktop/tsukuba/research/master/data/results/ngrams'
+    for n in [2, 3, 4, 5, 6]:
+        print("Executing %d-gram" % n)
+        tags = common_tags(n)
+        frequencies = common_tag_frequencies(tags, n)
+        gaps = frequency_gaps(frequencies, 'so')
+        sorted_gaps = sort_by_index(1, gaps)
+        # save_results(n, sorted_gaps)
