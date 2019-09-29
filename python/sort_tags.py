@@ -124,4 +124,4 @@ if __name__ == '__main__':
         frequencies = common_tag_frequencies(tags, n)
         gaps = frequency_gaps(frequencies, 'so')
         sorted_gaps = sort_by_index(1, gaps)
-        # save_results(n, sorted_gaps)
+        save_results(n, sorted_gaps)
