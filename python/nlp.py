@@ -9,7 +9,6 @@ import re
 
 
 class NLP:
-
     def tokens(self, text):
         """
             text の token を取得する関数
@@ -26,7 +25,7 @@ class NLP:
         """
             単語が要素のリストから、不要な文字を削除する関数
         """
-        pattern = re.compile(r'\w')
+        pattern = re.compile(r"\w")
         for i, word in enumerate(lst):
             if not pattern.findall(word):
                 del lst[i]
