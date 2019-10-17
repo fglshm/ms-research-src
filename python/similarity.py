@@ -23,8 +23,6 @@ def word_count_similarity(path, speech_type, speech_id):
         non-similarity = t番目の文の単語数 / (t-1)番目の文の単語数
         non-similarityをsin波のように出力する
         non-similarityの値が大きいほど類似度は低い
-        y軸: similarity
-        x軸: 文の番号
     """
     file_path = f"{path}/{speech_type}/{speech_id}.txt"
     sentences = preprocess(file_path)
@@ -35,33 +33,38 @@ def word_count_similarity(path, speech_type, speech_id):
         word_counts.remove(0)
     similarities = [0.0]
     for idx in range(len(word_counts) - 1):
-        sim = round(int(word_counts[idx]) / int(word_counts[idx - 1]), 2)
-        similarities.append(sim)
+        if int(word_counts[idx]) != 0:
+            sim = round(int(word_counts[idx]) / int(word_counts[idx - 1]), 2)
+            similarities.append(sim)
 
-        x = np.array(similarities)
-        y = np.arange(x.shape[0])
-        color = "blue" if speech_type == "so" else "red"
-        plt.title(f"speech {speech_id} sentence non-similarity about word count")
-        plt.xlabel("sentence")
-        plt.ylabel("non-similarity")
-        plt.plot(y, x, color=color)
-        save_path = (
-            "/Users/shohei/Documents/Tsukuba/Research/results/similarity/word_count"
-        )
-        figure = plt.gcf()
-        figure.set_size_inches(20, 10)
-        plt.savefig(
-            f"{save_path}/{speech_type}/{speech_type}_{speech_id}.eps", format="eps"
-        )
-        similarities = []
-        plt.clf()
+    return similarities
+
+
+def save_plt(similarities, speech_type, speech_id):
+    x = np.array(similarities)
+    y = np.arange(x.shape[0])
+    color = "blue" if speech_type == "so" else "red"
+    plt.title(f"speech {speech_id} sentence non-similarity about word count")
+    plt.xlabel("sentence")
+    plt.ylabel("non-similarity")
+    plt.plot(y, x, color=color)
+    save_path = "/Users/shohei/Documents/Tsukuba/Research/results/similarity/word_count"
+    figure = plt.gcf()
+    figure.set_size_inches(20, 10)
+    plt.savefig(
+        f"{save_path}/{speech_type}/{speech_type}_{speech_id}.pdf", format="pdf"
+    )
+    similarities = []
+    plt.clf()
 
 
 speech_types = ["so", "nso"]
 path = "/Users/shohei/Tsukuba/tsukuba/research/master/data/speech_original_transcripts"
 for speech_type in speech_types:
+    all_similaritites = []
     files = glob.glob(f"{path}/{speech_type}/*")
     for file in tqdm(files):
         speech_id = os.path.basename(file).split(".")[0]
-        word_count_similarity(path, speech_type, speech_id)
-
+        all_similaritites.append(word_count_similarity(path, speech_type, speech_id))
+    np_sim = np.array(all_similaritites)
+    np.save(f"{speech_type}_similarities.npy", np_sim)
