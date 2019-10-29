@@ -1,0 +1,34 @@
+Activism	53	27
+Art	54	74
+Biology	34	82
+Brain	41	76
+Business	96	112
+Children	60	42
+Collaboration	29	50
+Communication	98	89
+Community	41	29
+Creativity	43	47
+Culture	145	120
+Design	73	129
+Economics	30	59
+Education	53	47
+Entertainment	105	71
+Environment	50	73
+Future	37	55
+Global issues	262	172
+Health	59	78
+Health care	38	22
+History	24	38
+Humanity	71	48
+Identity	62	27
+Innovation	51	77
+Internet	27	37
+Invention	28	24
+Medicine	34	34
+Potential	21	26
+Psychology	26	48
+Science	189	283
+Social change	92	49
+Society	125	99
+Technology	173	299
+War	48	27

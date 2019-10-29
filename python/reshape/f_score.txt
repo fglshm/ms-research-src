@@ -1,0 +1,19 @@
+Art	0.88
+Biology	0.86
+Brain	0.57
+Business	0.82
+Children	0.79
+Communication	0.8
+Culture	0.81
+Design	0.67
+Education	0.81
+Entertainment	0.81
+Environment	0.71
+Global issues	0.81
+Health	0.82
+Humanity	0.77
+Innovation	0.8
+Science	0.62
+Social change	0.93
+Society	0.87
+Technology	0.67
