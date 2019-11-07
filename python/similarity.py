@@ -58,13 +58,19 @@ def save_plt(similarities, speech_type, speech_id):
     plt.clf()
 
 
-speech_types = ["so", "nso"]
-path = "/Users/shohei/Tsukuba/tsukuba/research/master/data/speech_original_transcripts"
-for speech_type in speech_types:
-    all_similaritites = []
-    files = glob.glob(f"{path}/{speech_type}/*")
-    for file in tqdm(files):
-        speech_id = os.path.basename(file).split(".")[0]
-        all_similaritites.append(word_count_similarity(path, speech_type, speech_id))
-    np_sim = np.array(all_similaritites)
-    np.save(f"{speech_type}_similarities.npy", np_sim)
+def main():
+    speech_types = ["so", "nso"]
+    path = "/Users/shohei/Tsukuba/tsukuba/research/master/data/speech_original_transcripts"
+    for speech_type in speech_types:
+        all_similaritites = []
+        files = glob.glob(f"{path}/{speech_type}/*")
+        for file in tqdm(files):
+            speech_id = os.path.basename(file).split(".")[0]
+            all_similaritites.append(
+                word_count_similarity(path, speech_type, speech_id))
+        np_sim = np.array(all_similaritites)
+        np.save(f"{speech_type}_similarities.npy", np_sim)
+
+
+if __name__ == "__main__":
+    main()
