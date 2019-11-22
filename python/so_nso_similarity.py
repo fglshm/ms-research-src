@@ -56,4 +56,3 @@ for standing_ovation, speech_type in enumerate(speech_types):
         ]
 
     df.to_csv("{}_sentence_stats.csv".format(speech_type), index=False)
-

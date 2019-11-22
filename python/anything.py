@@ -1,3 +1,6 @@
+from preprocessor import preprocess
+import time
+from tqdm import tqdm
 import glob
 import re
 import os
@@ -86,3 +89,177 @@ def count_60_duration_speeches():
          nso in zip(time_span_pathes, so_speech_count, nso_speech_count)]
         for span, so, nso in zip(time_span_pathes, so_speech_count, nso_speech_count):
             writer.writerow([re.sub(r'\.csv', r'', span), so, nso])
+
+
+def timing(f):
+    def wrap(*args):
+        time1 = time.time()
+        ret = f(*args)
+        time2 = time.time()
+        print("%s function took %0.3f ms" %
+              (f.__name__, (time2-time1)*1000.0))
+        return ret
+    return wrap
+
+
+"""
+    so/nso それぞれにしかないタグを、2,3,4,5,6-グラムでそれぞれ出力
+"""
+
+
+def timing(f):
+    def wrap(*args):
+        time1 = time.time()
+        ret = f(*args)
+        time2 = time.time()
+        print("%s function took %0.3f ms" %
+              (f.__name__, (time2-time1)*1000.0))
+        return ret
+    return wrap
+
+
+class UniquTags:
+
+    """
+    so/nso それぞれにしかないタグを、2,3,4,5,6-グラムでそれぞれ出力
+    """
+
+    def remove_tags(self, data):
+        """
+            一定値以下の出現頻度のタグは削除して配列を返す
+        """
+        print("Removing too low frequency tags")
+        idx = 0
+        min_value = 0.00001
+        for i, elem in enumerate(data):
+            if float(elem[1]) < min_value:
+                idx = i
+                break
+
+        return data[0:idx]
+
+    def data_filename(self, s_type, n):
+        """
+            so/nso の ngram のファイル名を返す
+        """
+        return '%s/%s_%sgrams.txt' % (ngrams_path, s_type, n)
+
+    def ngram_data(self, filename):
+        """
+            tag と 出現頻度の値を分割した配列を要素とした配列を返す
+        """
+        file = open(filename).read().strip().split('\n')
+        data = [elem.split(': ') for elem in file]
+        return data
+
+    @timing
+    def common_tags(self, n):
+        """
+            so/nso 共通のタグを返す
+        """
+        so_ngrams_filename = data_filename('so', n)
+        nso_ngrams_filename = data_filename('nso', n)
+        all_tags = []
+        for filename in [so_ngrams_filename, nso_ngrams_filename]:
+            data = ngram_data(filename)
+            [all_tags.append(elem[0]) for elem in data]
+        print("Finding common tags")
+        seen = {}
+        commons = set()
+        for tag in all_tags:
+            if tag not in seen:
+                seen[tag] = 1
+            else:
+                if seen[tag] == 1:
+                    commons.add(tag)
+                seen[tag] += 1
+        return commons
+
+    @timing
+    def unique_tags(self, n, commons, s_type):
+        """
+            so/nso それぞれのみに存在するタグを返す
+        """
+        ngrams_filename = data_filename(s_type, n)
+        data = ngram_data(ngrams_filename)
+        data = remove_tags(data)
+        tags = [tag[0] for tag in tqdm(data)]
+        unique = []
+        for tag in tqdm(tags):
+            if tag not in commons:
+                unique.append(tag)
+        return unique
+
+    def execute(self):
+        ngrams_path = '/Users/shohei/Desktop/tsukuba/research/master/data/results/ngrams'
+        for n in [2, 3, 4, 5, 6]:
+            commons = common_tags(n)
+            so_unique = unique_tags(n, commons, 'so')
+            nso_unique = unique_tags(n, commons, 'nso')
+            print('so', n, len(so_unique))
+            print('nso', n, len(nso_unique))
+
+
+def find_not_but_syntax():
+    """
+        Let's search "not ~ but syntax" !!!
+    """
+
+    so_path = (
+        "/Users/shohei/Tsukuba/tsukuba/research/master/data/speech_original_transcripts/so"
+    )
+
+    for idx, filename in enumerate(glob.glob(f"{so_path}/*")):
+        sentences = preprocess(filename)
+        for sentence in sentences:
+            if "not" in sentence:
+                if "but" in sentence:
+                    print()
+                    print(sentence)
+        if idx == 0:
+            break
+
+
+class UnableCheckSpeeches:
+
+    """
+    卒論時に、SO でも NSO でもなく、チェックできなかったスピーチを取得するコード
+    """
+
+    def remove_double_empty(self, lst):
+        """
+        連続した空白を削除
+        """
+        return [re.sub(r'\s+', r' ', elem) for elem in lst]
+
+    def leave_only_chara_and_number(self, lst):
+        """
+            記号と数字以外を空白に変換し、要素を小文字に変換
+        """
+        return [re.sub(r'[^a-z0-9\s]', r'', elem.lower().strip()) for elem in lst]
+
+    def execute(self):
+        all_speeches = open(
+            '../data/all_titles.txt').read().strip().split('\n')
+        so_speeches = open('../data/so_titles.txt').read().strip().split('\n')
+        nso_speeches = open(
+            '../data/nso_titles.txt').read().strip().split('\n')
+
+        all_speeches = remove_double_empty(
+            leave_only_chara_and_number(all_speeches))
+        so_speeches = remove_double_empty(
+            leave_only_chara_and_number(so_speeches))
+        nso_speeches = remove_double_empty(
+            leave_only_chara_and_number(nso_speeches))
+
+        for so in so_speeches:
+            if so in all_speeches:
+                all_speeches.remove(so)
+
+        for nso in nso_speeches:
+            if nso in all_speeches:
+                all_speeches.remove(nso)
+
+        with open('../data/unable_checked_speech_titles.txt', 'a') as f:
+            for speech in all_speeches:
+                f.write('%s\n' % speech)
